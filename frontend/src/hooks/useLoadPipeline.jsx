@@ -12,7 +12,7 @@ export const useLoadPipeline = () => {
   const [workspace, setWorkspace] = useImmerAtom(workspaceAtom);
   const savePipelineMutation = trpc.savePipeline.useMutation();
 
-  const loadPipeline = async (file) => {
+  const loadPipeline = async (file) => { // called when load a pipeline from directory.
     console.log("***********Loading pipeline from file:", file);
 
     let relPath = file.webkitRelativePath;

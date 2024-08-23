@@ -114,7 +114,7 @@ export const appRouter = router({
       }
     }),
   //TODO: load and validate schema
-  savePipeline: publicProcedure
+  savePipeline: publicProcedure // right path function
     .use(errorHandling)
     .input(
       z.object({
@@ -128,7 +128,7 @@ export const appRouter = router({
       const { input } = opts;
       let { name, writePath } = input;
       const { buffer, specs } = input;
-      if (!writePath) {
+      if (!writePath) { // write pipe is the parameter is the procudre 
         const savePath = await dialog.showSaveDialog({
           properties: ["createDirectory"],
         });

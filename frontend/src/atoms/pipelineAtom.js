@@ -19,7 +19,7 @@ export const pipelineFactory = (cachePath, pipeline = null) => {
     id: id,
     name: id,
     saveTime: null,
-    buffer: buffer,
+    buffer: buffer, // referred to the destination.
     path: undefined,
     data: {},
     logs: [],

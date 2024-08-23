@@ -40,7 +40,7 @@ export default function SavePipelineButton() {
     const response = await savePipeline.mutateAsync(saveData);
     const { name, dirPath, specs } = response;
 
-    setPipeline((draft) => {
+    setPipeline((draft) => { // save a pipeline to a driectory.
       draft.saveTime = Date.now();
       if (name) {
         draft.name = name;

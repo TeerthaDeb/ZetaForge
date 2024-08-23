@@ -43,7 +43,7 @@ function hasContainer(blockSpec) {
   return blockSpec.action.container || blockSpec.action.pipeline;
 }
 
-export async function copyPipeline(pipelineSpecs, fromDir, toDir) {
+export async function copyPipeline(pipelineSpecs, fromDir, toDir) { // copies the file from src to dest.
   const bufferPath = path.resolve(process.cwd(), fromDir);
 
   // Takes existing pipeline + spec
