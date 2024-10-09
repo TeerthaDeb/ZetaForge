@@ -2,17 +2,15 @@ import os
 import sys
 
 def compute(name_of_the_file):
-    # Print the name of the folder
-    print(f"Folder Name: {name_of_the_file}")
-    print("SYS ARGS: ", sys.argv)
-    # List the contents of the folder
-    if os.path.exists(name_of_the_file):
-        contents = os.listdir(name_of_the_file)
-        print("Contents of the folder:")
-        for item in contents:
-            print(item)
+    """Receives the names of the files and does what it needs.
+
+    Args:
+        name_of_the_file (str): The path to the zip folder.
+    """
+    if os.path.isfile(name_of_the_file):
+        print(f"Received zip file: {os.path.basename(name_of_the_file)}")
     else:
-        print(f"The folder '{name_of_the_file}' does not exist.")
+        print("No valid zip file found.")
 
 def test():
     print("HELLO WORLD FROM TEST")
