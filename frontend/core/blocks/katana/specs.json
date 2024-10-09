@@ -1,0 +1,53 @@
+{
+	"information": {
+	  "id": "katana",
+	  "name": "Katana Block",
+	  "description": "RUNS an entire pipeline",
+	  "system_versions": [
+		"0.1"
+	  ],
+	  "block_version": "block version number",
+	  "block_source": "core/blocks/katana",
+	  "block_type": "compute"
+	},
+	"inputs": {
+	  "pipeline_folder": {
+		"type": "Any",
+		"connections": [],
+		"relays": []
+	  }
+	},
+	"outputs": {
+	  "history_contents": {
+		"type": "Any",
+		"connections": [],
+		"relays": []
+	  }
+	},
+	"action": {
+	  "container": {
+		"image": "katana",
+		"version": "latest",
+		"command_line": [
+		  "python",
+		  "entrypoint.py"
+		]
+	  }
+	},
+	"views": {
+	  "node": {
+		"behavior": "modal",
+		"active": "True",
+		"title_bar": {},
+		"preview": {
+		  "active": "false"
+		},
+		"html": "",
+		"pos_x": "300",
+		"pos_y": "200",
+		"pos_z": "999"
+	  }
+	},
+	"events": {}
+  }
+  
