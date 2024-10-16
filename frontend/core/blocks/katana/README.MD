@@ -13,19 +13,14 @@ This block is a basic unit for executing operations within a pipeline. It proces
 
 ## Input and Output
 
-- **Input**: A folder containing a saved pipeline's history folder.
+- **Input**: ZIP file of an entire pipeline , KATANA as ZIP(THE PROVIDED ONE, IT IS DIFFERENT FROM KATANA BRANCH) , file(s) required for zipped pipeline.
 - **Output**: A text file listing the contents of the specified history folder.
 
-## Running the Block
+## KATANA AS A BLOCK VERSION: 0.01 (ABLE TO WORK UV MODE INSIDE DOCKER MODE)
 
-1. Ensure all required dependencies are installed by running:
-   ```
-   pip install -r requirements.txt
-   ```
+## NEXT TASKS:
+- katana.zip should not be passed.
+- all inputs for the zip pipelines should be dynamic including integers, float and every single inputs.
 
-2. Run the block using:
-   ```
-   python computations.py
-   ```
-
-3. The output file will be created in the history folder, listing all files and subfolders.
+## FOR TRYING:
+zip file of a simple canny-edge is given, a katana.zip is given. choose any image for input. name should be: 'img.jpg'.

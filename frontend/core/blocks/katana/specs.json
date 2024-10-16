@@ -11,11 +11,21 @@
 	  "block_type": "compute"
 	},
 	"inputs": {
-	  "pipeline_folder": {
+	  "name_of_the_file": {
 		"type": "Any",
 		"connections": [],
 		"relays": []
-	  }
+	  },
+		"go_file":{
+			"type": "Any",
+			"connections": [],
+			"relays": []
+		},
+		"input_file": {
+			"type": "Any",
+			"connections": [],
+			"relays" : []
+		}
 	},
 	"outputs": {
 	  "history_contents": {
