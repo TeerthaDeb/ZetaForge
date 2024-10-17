@@ -72,7 +72,7 @@ def compute(name_of_the_file : str, go_file : str , input_file : str) -> dict:
         
         try:
             # print(f"Running Go from directory: {go_extract_dir}")
-            subprocess.run(["go", "run", ".", "--mode=uv", name_of_the_pipeline , input_file], cwd=go_extract_dir, check=True)
+            subprocess.run(["go", "run", ".", "--mode=uv", name_of_the_pipeline, f"path:{input_file}"], cwd=go_extract_dir, check=True)
         except Exception as e:
             print(f"Error running Go command: {e}")
 

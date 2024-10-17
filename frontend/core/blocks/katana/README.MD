@@ -16,11 +16,12 @@ This block is a basic unit for executing operations within a pipeline. It proces
 - **Input**: ZIP file of an entire pipeline , KATANA as ZIP(THE PROVIDED ONE, IT IS DIFFERENT FROM KATANA BRANCH) , file(s) required for zipped pipeline.
 - **Output**: A text file listing the contents of the specified history folder.
 
-## KATANA AS A BLOCK VERSION: 0.01 (ABLE TO WORK UV MODE INSIDE DOCKER MODE)
+## KATANA AS A BLOCK VERSION: 0.02 (ABLE TO WORK UV MODE INSIDE DOCKER MODE)
 
 ## NEXT TASKS:
 - katana.zip should not be passed.
 - all inputs for the zip pipelines should be dynamic including integers, float and every single inputs.
 
 ## FOR TRYING:
-zip file of a simple canny-edge is given, a katana.zip is given. choose any image for input. name should be: 'img.jpg'.
+choose any image for input. name can be anything right now. just make sure thats an image. xd
+zip file of a simple canny-edge is given, a katana.zip is given. 
