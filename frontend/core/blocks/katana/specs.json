@@ -21,10 +21,15 @@
 			"connections": [],
 			"relays": []
 		},
-		"input_file": {
+		"input_files": {
 			"type": "Any",
 			"connections": [],
 			"relays" : []
+		},
+		"text_argument" : {
+			"type": "Any",
+			"connections": [],
+			"relays": []
 		}
 	},
 	"outputs": {
