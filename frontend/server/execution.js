@@ -18,7 +18,7 @@ export async function syncExecutionResults(
   }
 
   const localPath = path.join(resultPath, "history", executionUuid, "files");
-
+  console.log("localPath: " ,localPath)
   await syncS3ToLocalDirectory(s3Prefix, localPath, anvilConfiguration);
 
   // TODO: Fix all of this for real

@@ -60,6 +60,7 @@ export default function WorkspaceFetcher() {
     });
     if (isActive) {
       try {
+        console.log("trying sYnc Results.")
         await syncResults(key);
       } catch (err) {
         console.error("Failed to sync results: ", err);

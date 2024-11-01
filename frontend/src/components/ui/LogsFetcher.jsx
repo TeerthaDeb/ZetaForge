@@ -28,10 +28,11 @@ function splitLogPath(input) {
 async function fetchLogData(logPath, configuration) {
   const { pipelineId, executionId, file } = splitLogPath(logPath);
   const localFileKey = `${pipelineId}/history/${executionId}/files/${file}`;
-
+  console.log("localFileKey: ",localFileKey)
   try {
     // First, try to fetch from localhost
     const localData = await getLocalFileData(localFileKey);
+    console.log("localFetch:" ,localData);
     return localData;
   } catch (error) {
     console.log("Failed to fetch from localhost, falling back to S3:", error);
