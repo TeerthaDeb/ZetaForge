@@ -160,6 +160,7 @@ export async function getFileData(key, anvilConfiguration) {
 }
 
 export async function getFile(key, destinationPath, anvilConfiguration) {
+  console.log("GETFILE funciton got hit with key: " ,key , "and destination patH: " ,destinationPath)
   const client = getClient(anvilConfiguration);
   try {
     const response = await client.send(

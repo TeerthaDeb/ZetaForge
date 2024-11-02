@@ -73,6 +73,7 @@ func upload(ctx context.Context, source string, key string, cfg Config) error {
 
 func downloadFile(ctx context.Context, key string, filename string, cfg Config) error {
 	client, err := s3Client(ctx, cfg)
+	fmt.Println("Client:", client)
 	if err != nil {
 		return err
 	}
@@ -81,6 +82,7 @@ func downloadFile(ctx context.Context, key string, filename string, cfg Config) 
 		Bucket: aws.String(cfg.BucketName),
 		Key:    &key,
 	})
+	fmt.Println("result: ", result)
 
 	if err != nil {
 		return err
@@ -91,6 +93,7 @@ func downloadFile(ctx context.Context, key string, filename string, cfg Config) 
 		result.Body.Close()
 		return err
 	}
+	fmt.Println("file: ", file)
 
 	if _, err := io.Copy(file, result.Body); err != nil {
 		result.Body.Close()

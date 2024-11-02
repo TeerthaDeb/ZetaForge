@@ -32,7 +32,6 @@ async function fetchLogData(logPath, configuration) {
   try {
     // First, try to fetch from localhost
     const localData = await getLocalFileData(localFileKey);
-    console.log("localFetch:" ,localData);
     return localData;
   } catch (error) {
     console.log("Failed to fetch from localhost, falling back to S3:", error);

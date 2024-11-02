@@ -138,6 +138,7 @@ export const useLoadServerPipeline = () => {
     if (!serverPipeline) {
       return;
     }
+  
     const host = configuration?.anvil?.host;
     const port = configuration?.anvil?.port;
     const hostString = host + ":" + port;
@@ -145,6 +146,7 @@ export const useLoadServerPipeline = () => {
     const localKey = serverPipeline.Uuid + ".";
     let path = `${await window.cache.local()}${serverPipeline.Uuid}`;
     const local = workspace.pipelines[localKey];
+    
     // Need to check if we've loaded a local path and use it for the history
     if (local && local.path) {
       path = local.path;
@@ -173,6 +175,7 @@ export const useLoadServerPipeline = () => {
       host: hostString,
       socketUrl: socketUrl,
     };
+    
     let newPipeline = pipelineFactory(
       await window.cache.local(),
       loadedPipeline,
@@ -232,6 +235,8 @@ export const useLoadExecution = () => {
       loadedPipeline,
     );
     // sort keys
+    console.log("patH: " ,path)
+    console.log("local: " ,local)
     newPipeline = sortSpecsKeys(newPipeline);
     return newPipeline;
   };
