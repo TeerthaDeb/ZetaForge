@@ -263,29 +263,42 @@ func blockTemplate(block *zjson.Block, hash string, blockKey string, key string,
 
 	// GPU resources
 	if block.Action.Resources.GPU.Count > 0 {
-		gpuCount := strconv.Itoa(block.Action.Resources.GPU.Count)
-		if quantity, err := resource.ParseQuantity(gpuCount); err == nil {
-			template.Container.Resources.Requests["nvidia.com/gpu"] = quantity
-			template.Container.Resources.Limits["nvidia.com/gpu"] = quantity
-		}
-		// Add GPU node affinity based on NodePool name
-		template.Affinity = &corev1.Affinity{
-			NodeAffinity: &corev1.NodeAffinity{
-				RequiredDuringSchedulingIgnoredDuringExecution: &corev1.NodeSelector{
-					NodeSelectorTerms: []corev1.NodeSelectorTerm{
-						{
-							MatchExpressions: []corev1.NodeSelectorRequirement{
-								{
-									Key:      "karpenter.sh/nodepool",
-									Operator: corev1.NodeSelectorOpIn,
-									Values:   []string{"gpu-pool"},
-								},
-							},
-						},
-					},
-				},
-			},
-		}
+    gpuCount := strconv.Itoa(block.Action.Resources.GPU.Count)
+		fmt.Println("BLock::" ,block);
+	
+    gpuSizeRequest := block.Action.Resources.GPUSize.Request
+    gpuSizeLimit := block.Action.Resources.GPUSize.Limit
+
+    // Add GPU resources to the template if required
+    if countQuantity, err := resource.ParseQuantity(gpuCount); err == nil {
+        template.Container.Resources.Requests["nvidia.com/gpu"] = countQuantity
+        template.Container.Resources.Limits["nvidia.com/gpu"] = countQuantity
+    }
+    if sizeQuantity, err := resource.ParseQuantity(gpuSizeRequest); err == nil {
+        template.Container.Resources.Requests["nvidia.com/gpu-size"] = sizeQuantity
+    }
+    if sizeQuantity, err := resource.ParseQuantity(gpuSizeLimit); err == nil {
+        template.Container.Resources.Limits["nvidia.com/gpu-size"] = sizeQuantity
+    }
+
+    // Add GPU node affinity based on GPU size
+    template.Affinity = &corev1.Affinity{
+        NodeAffinity: &corev1.NodeAffinity{
+            RequiredDuringSchedulingIgnoredDuringExecution: &corev1.NodeSelector{
+                NodeSelectorTerms: []corev1.NodeSelectorTerm{
+                    {
+                        MatchExpressions: []corev1.NodeSelectorRequirement{
+                            {
+                                Key:      "karpenter.sh/nodepool",
+                                Operator: corev1.NodeSelectorOpIn,
+                                Values:   []string{fmt.Sprintf("gpu-size-%s", gpuSizeRequest)}, 
+                            },
+                        },
+                    },
+                },
+            },
+        },
+    }
 
 		// Add toleration for GPU taint
 		template.Tolerations = []corev1.Toleration{

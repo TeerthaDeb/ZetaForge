@@ -9,6 +9,8 @@ export const BlockResources = ({ block, setFocusAction, id }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [configuration] = useAtom(activeConfigurationAtom);
   const [cpu, setCpu] = useState(block.action.resources?.cpu?.request || "");
+  const [gpuRequest, setGpuRequest] = useState(block.action.resources?.gpu_size?.request || "");
+
   const [memory, setMemory] = useState(
     block.action.resources?.memory?.request || "",
   );
@@ -26,26 +28,34 @@ export const BlockResources = ({ block, setFocusAction, id }) => {
       className="mt-2"
     />
   );
-  if (isLocalhost) {
-    toggle = (
-      <ResourceTooltip
-        content="GPU is not available on local Kubernetes, connect to Forge Cloud to use GPU."
-        icon={Information}
-        className="top-3"
-      >
-        {toggle}
-      </ResourceTooltip>
-    );
-  }
+  // if (isLocalhost) {
+  //   toggle = (
+  //     <ResourceTooltip
+  //       content="GPU is not available on local Kubernetes, connect to Forge Cloud to use GPU."
+  //       icon={Information}
+  //       className="top-3"
+  //     >
+  //       {toggle}
+  //     </ResourceTooltip>
+  //   );
+  // }
 
   const handleResourceChange = (type, value) => {
+    console.log("value: " , value);
     setFocusAction((draft) => {
       if (!draft.data[id].action.resources) {
         draft.data[id].action.resources = {};
       }
       if (type === "gpu") {
         draft.data[id].action.resources.gpu = { count: value ? 1 : 0 };
-      } else {
+      } else if (type === "GPURequest") {
+        draft.data[id].action.resources["nvidia.com/gpu"] = {
+          request: value,  // The number of GPUs requested
+          limit: value,    // Same as request for limits
+        };
+        setGpuRequest(value);
+        console.log("GPU Requested: ", value);
+      }  else {
         draft.data[id].action.resources[type] = {
           request: value,
           limit: value,
@@ -55,6 +65,7 @@ export const BlockResources = ({ block, setFocusAction, id }) => {
     if (type === "cpu") setCpu(value);
     if (type === "memory") setMemory(value);
     if (type === "gpu") setGpuEnabled(value);
+    if (type === "GPURequest") setGpuRequest(value);
   };
 
   const iconStyles = { right: "5px" };
@@ -105,6 +116,24 @@ export const BlockResources = ({ block, setFocusAction, id }) => {
             />
           </ResourceTooltip>
           {toggle}
+          {gpuEnabled && ( // just to put it after gpu toggle, i put it under {toglle}.
+              <div>
+                <label htmlFor={`gpu-size-dropdown-${id}`} className="block text-sm font-small">
+                  GPU VRam
+                </label>
+                <select
+                  id={`gpu-size-dropdown-${id}`}
+                  value={gpuRequest}
+                  onChange={(e) => handleResourceChange("GPURequest", e.target.value)}
+                  className="mt-1 block w-52 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                >
+                  <option value="24">24 GB</option>
+                  {/* <option value="36">36 GB</option> */} {/* I can add more values like this....... */}
+                  <option value="48">48 GB</option>
+                </select>
+              </div>
+            )}
+            
         </div>
       )}
     </div>

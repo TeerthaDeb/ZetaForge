@@ -87,6 +87,7 @@ export default function RunPipelineButton({ children, action }) {
   const execute = async (pipelineSpecs, executionId) => {
     try {
       const rebuild = action == "Rebuild";
+      console.log("specs: " ,pipelineSpecs);
       const newExecution = await executePipeline.mutateAsync({
         id: pipeline.id,
         executionId: executionId,

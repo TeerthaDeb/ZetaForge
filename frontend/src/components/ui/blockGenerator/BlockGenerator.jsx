@@ -215,6 +215,7 @@ const BlockGenerator = ({
             </div>
             {content}
           </div>
+          {/* {console.log("resources: " ,resources)} * GPU SIZE is coming till here. */}
           {isContainer ? resources : null}
         </div>
       </div>
