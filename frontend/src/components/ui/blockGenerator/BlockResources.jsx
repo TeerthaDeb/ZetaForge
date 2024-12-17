@@ -9,7 +9,7 @@ export const BlockResources = ({ block, setFocusAction, id }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [configuration] = useAtom(activeConfigurationAtom);
   const [cpu, setCpu] = useState(block.action.resources?.cpu?.request || "");
-  const [gpuRequest, setGpuRequest] = useState(block.action.resources?.gpu_size?.request || "");
+  const [GPURequest, setGPURequest] = useState(block.action.resources?.GPURequest?.request || "");
 
   const [memory, setMemory] = useState(
     block.action.resources?.memory?.request || "",
@@ -49,13 +49,13 @@ export const BlockResources = ({ block, setFocusAction, id }) => {
       if (type === "gpu") {
         draft.data[id].action.resources.gpu = { count: value ? 1 : 0 };
       } else if (type === "GPURequest") {
-        draft.data[id].action.resources["nvidia.com/gpu"] = {
-          request: value,  // The number of GPUs requested
-          limit: value,    // Same as request for limits
+        draft.data[id].action.resources.GPURequest  = {
+          request: value,
+          limit: value === "48" ? "48" : "24", // L40S has 48GB of GPU memory, src : "https://lambdalabs.com/products/scalar?matchtype=p&adgroup=149928204710&feeditemid=&loc_interest_ms=&loc_physical_ms=9000472&network=g&device=c&devicemodel=&adposition=&utm_source=google&utm_campaign=Google_Search_Generic_Scalar&utm_medium=search&utm_term=l40s&utm_content=648094246761&hsa_acc=1731978716&hsa_cam=1643492806&hsa_grp=149928204710&hsa_ad=648094246761&hsa_src=g&hsa_tgt=kwd-816145646336&hsa_kw=l40s&hsa_mt=p&hsa_net=adwords&hsa_ver=3&gad_source=1&gclid=Cj0KCQiAvP-6BhDyARIsAJ3uv7bx1kuaVox1phwTbJASPebj4gO8YHLEYv0yaM83R6m5LnF82PiNUd8aAkqJEALw_wcB"
         };
-        setGpuRequest(value);
-        console.log("GPU Requested: ", value);
-      }  else {
+        setGPURequest(value);
+        console.log("GPU SIZE: " ,GPURequest); // shows previous value.
+      } else {
         draft.data[id].action.resources[type] = {
           request: value,
           limit: value,
@@ -65,7 +65,7 @@ export const BlockResources = ({ block, setFocusAction, id }) => {
     if (type === "cpu") setCpu(value);
     if (type === "memory") setMemory(value);
     if (type === "gpu") setGpuEnabled(value);
-    if (type === "GPURequest") setGpuRequest(value);
+    if (type === "GPURequest") setGPURequest(value);
   };
 
   const iconStyles = { right: "5px" };
@@ -123,7 +123,7 @@ export const BlockResources = ({ block, setFocusAction, id }) => {
                 </label>
                 <select
                   id={`gpu-size-dropdown-${id}`}
-                  value={gpuRequest}
+                  value={GPURequest}
                   onChange={(e) => handleResourceChange("GPURequest", e.target.value)}
                   className="mt-1 block w-52 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                 >

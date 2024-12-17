@@ -12,7 +12,7 @@ async function merklePipeline(pipeline, pipelinePath) {
   const node = {
     blocks: {},
   };
-
+  console.log("pipeline we got: " ,pipeline)
   for (let key in pipeline) {
     const childBlock = pipeline[key];
     if (hasPipeline(childBlock)) {

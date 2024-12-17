@@ -52,7 +52,6 @@ type Config struct {
 	Cloud           Cloud `json:"Cloud,omitempty"`
 }
 
-
 type Local struct {
 	BucketPort int
 	Driver     string
@@ -380,6 +379,7 @@ func validateJson[D any](body io.ReadCloser) (D, HTTPError) {
 	schemaLoader := gojsonschema.NewStringLoader(string(schema))
 	jsonLoader := gojsonschema.NewStringLoader(buffer.String())
 	result, err := gojsonschema.Validate(schemaLoader, jsonLoader)
+	fmt.Println("Result: " , result)
 
 	if err != nil {
 		return data, InternalServerError{err.Error()}
@@ -534,7 +534,7 @@ func main() {
 		prefix := getPrefix(ctx)
 		execution, err := validateJson[zjson.Execution](ctx.Request.Body)
 		if err != nil {
-			log.Printf("invalid json request; err=%v", err)
+			log.Printf("invalid json request line 537; err=%v", err)
 			ctx.String(err.Status(), err.Error())
 			return
 		}
@@ -632,6 +632,7 @@ func main() {
 	router.POST("/build-context-status", func(ctx *gin.Context) {
 		prefix := getPrefix(ctx)
 		request, err := validateJson[zjson.BuildContextStatusRequest](ctx.Request.Body)
+		fmt.Println("main.go: line 635. Requst: ", request)
 		if err != nil {
 			log.Printf("invalid json request; err=%v", err)
 			ctx.String(err.Status(), err.Error())
@@ -721,7 +722,7 @@ func main() {
 		prefix := getPrefix(ctx)
 		pipeline, err := validateJson[zjson.Pipeline](ctx.Request.Body)
 		if err != nil {
-			log.Printf("Invalid json request; err=%v", err)
+			log.Printf("Invalid json request line 725; err=%v", err)
 			ctx.String(err.Status(), err.Error())
 			return
 		}

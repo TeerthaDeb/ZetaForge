@@ -191,7 +191,8 @@ export async function executePipeline(
   rebuild,
   anvilHostConfiguration,
 ) {
-  specs = await uploadBlocks(id, executionId, specs, anvilHostConfiguration);
+  console.log("specs came in pipeline serialization: " ,specs)
+  specs = await uploadBlocks(id, executionId, specs, anvilHostConfiguration); // assuming just uploads files. because other blocks don't have parameters
   specs["sink"] = pipelinePath;
   specs["build"] = pipelinePath;
   specs["name"] = name;

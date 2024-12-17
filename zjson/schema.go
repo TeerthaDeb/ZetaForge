@@ -44,16 +44,16 @@ type GPU struct {
 	Count int `json:"count"`
 }
 
-type GPURequest struct {
+type GPUSize struct {
 	Request string `json:"request"`
 	Limit   string `json:"limit"`
 }
 
 type Resources struct {
-	CPU     ResourceQuantity `json:"cpu,omitempty"`
-	Memory  ResourceQuantity `json:"memory,omitempty"`
-	GPU     GPU              `json:"gpu,omitempty"`
-	GPUSize GPURequest       `json:"gpu_size,omitempty"`
+	CPU        ResourceQuantity `json:"cpu,omitempty"`
+	Memory     ResourceQuantity `json:"memory,omitempty"`
+	GPU        GPU              `json:"gpu,omitempty"`
+	GPURequest GPUSize          `json:"GPURequest,omitempty"`
 }
 
 type Action struct {

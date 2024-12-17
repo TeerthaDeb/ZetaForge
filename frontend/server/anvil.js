@@ -121,11 +121,13 @@ async function handleRequest(url, method, token, headers, body = null) {
   }
 
   try {
+    console.log("url: " ,url);
     const response = await fetch(url, {
       method: method,
       headers: headers,
       body: body ? JSON.stringify(body) : null,
     });
+    console.log("response: ", response);
     return response;
   } catch (error) {
     const message = "Anvil request failed";

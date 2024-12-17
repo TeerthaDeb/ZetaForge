@@ -266,8 +266,8 @@ func blockTemplate(block *zjson.Block, hash string, blockKey string, key string,
     gpuCount := strconv.Itoa(block.Action.Resources.GPU.Count)
 		fmt.Println("BLock::" ,block);
 	
-    gpuSizeRequest := block.Action.Resources.GPUSize.Request
-    gpuSizeLimit := block.Action.Resources.GPUSize.Limit
+    gpuSizeRequest := block.Action.Resources.GPURequest.Request
+    gpuSizeLimit := block.Action.Resources.GPURequest.Limit
 
     // Add GPU resources to the template if required
     if countQuantity, err := resource.ParseQuantity(gpuCount); err == nil {
