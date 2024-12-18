@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"path/filepath"
 	"strconv"
@@ -263,42 +264,45 @@ func blockTemplate(block *zjson.Block, hash string, blockKey string, key string,
 
 	// GPU resources
 	if block.Action.Resources.GPU.Count > 0 {
-    gpuCount := strconv.Itoa(block.Action.Resources.GPU.Count)
-		fmt.Println("BLock::" ,block);
-	
-    gpuSizeRequest := block.Action.Resources.GPURequest.Request
-    gpuSizeLimit := block.Action.Resources.GPURequest.Limit
+		gpuCount := strconv.Itoa(block.Action.Resources.GPU.Count)
+		gpuSizeRequest := block.Action.Resources.GPURequest.Request
 
-    // Add GPU resources to the template if required
-    if countQuantity, err := resource.ParseQuantity(gpuCount); err == nil {
-        template.Container.Resources.Requests["nvidia.com/gpu"] = countQuantity
-        template.Container.Resources.Limits["nvidia.com/gpu"] = countQuantity
-    }
-    if sizeQuantity, err := resource.ParseQuantity(gpuSizeRequest); err == nil {
-        template.Container.Resources.Requests["nvidia.com/gpu-size"] = sizeQuantity
-    }
-    if sizeQuantity, err := resource.ParseQuantity(gpuSizeLimit); err == nil {
-        template.Container.Resources.Limits["nvidia.com/gpu-size"] = sizeQuantity
-    }
+		// Map GPU VRAM request to AWS instance types
+		// table : https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs-gpu.html
+		var instanceType string
+		if gpuSizeRequest == "24" {
+			instanceType = "g5.xlarge" // Example: 24GB maps to g5
+		} else if gpuSizeRequest == "48" {
+			instanceType = "g6e.xlarge" // Example: 48GB maps to g6e
+		} else {
+			log.Printf("Unsupported GPU size request: %s", gpuSizeRequest)
+			return template
+		}
 
-    // Add GPU node affinity based on GPU size
-    template.Affinity = &corev1.Affinity{
-        NodeAffinity: &corev1.NodeAffinity{
-            RequiredDuringSchedulingIgnoredDuringExecution: &corev1.NodeSelector{
-                NodeSelectorTerms: []corev1.NodeSelectorTerm{
-                    {
-                        MatchExpressions: []corev1.NodeSelectorRequirement{
-                            {
-                                Key:      "karpenter.sh/nodepool",
-                                Operator: corev1.NodeSelectorOpIn,
-                                Values:   []string{fmt.Sprintf("gpu-size-%s", gpuSizeRequest)}, 
-                            },
-                        },
-                    },
-                },
-            },
-        },
-    }
+		// Add GPU count to the template
+		if countQuantity, err := resource.ParseQuantity(gpuCount); err == nil {
+			template.Container.Resources.Requests["nvidia.com/gpu"] = countQuantity
+			template.Container.Resources.Limits["nvidia.com/gpu"] = countQuantity
+		}
+
+		// Node affinity for specific instance types
+		template.Affinity = &corev1.Affinity{
+			NodeAffinity: &corev1.NodeAffinity{
+				RequiredDuringSchedulingIgnoredDuringExecution: &corev1.NodeSelector{
+					NodeSelectorTerms: []corev1.NodeSelectorTerm{
+						{
+							MatchExpressions: []corev1.NodeSelectorRequirement{
+								{
+									Key:      "karpenter.sh/instance-type",
+									Operator: corev1.NodeSelectorOpIn,
+									Values:   []string{instanceType},
+								},
+							},
+						},
+					},
+				},
+			},
+		}
 
 		// Add toleration for GPU taint
 		template.Tolerations = []corev1.Toleration{
