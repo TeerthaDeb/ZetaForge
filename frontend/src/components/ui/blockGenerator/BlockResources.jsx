@@ -15,6 +15,8 @@ export const BlockResources = ({ block, setFocusAction, id }) => {
   const [gpuEnabled, setGpuEnabled] = useState(
     block.action.resources?.gpu?.count > 0,
   );
+  const [gpuSize, setGpuSize] = useState(block.action.resources?.gpu?.size || "24"); // Updated to 'size'
+
   const isLocalhost = configuration?.anvil?.host == "localhost";
   let toggle = (
     <Toggle
@@ -39,12 +41,17 @@ export const BlockResources = ({ block, setFocusAction, id }) => {
   }
 
   const handleResourceChange = (type, value) => {
+    console.log("Requested: " ,value , " type: ", type);
     setFocusAction((draft) => {
       if (!draft.data[id].action.resources) {
         draft.data[id].action.resources = {};
       }
       if (type === "gpu") {
-        draft.data[id].action.resources.gpu = { count: value ? 1 : 0 };
+        draft.data[id].action.resources.gpu = { count: value ? (gpuSize === "48" ? 2 : 1) : 0 };
+      } else if (type === "gpu-size") {
+        draft.data[id].action.resources.gpu = { count: gpuEnabled ? (value === "48" ? 2 : 1) : 0 };
+        // setGpuSize(value);
+        console.log("previous Gpu size: " , gpuSize);
       } else {
         draft.data[id].action.resources[type] = {
           request: value,
@@ -55,6 +62,7 @@ export const BlockResources = ({ block, setFocusAction, id }) => {
     if (type === "cpu") setCpu(value);
     if (type === "memory") setMemory(value);
     if (type === "gpu") setGpuEnabled(value);
+    if (type === "gpu-size") setGpuSize(value);
   };
 
   const iconStyles = { right: "5px" };
@@ -105,6 +113,23 @@ export const BlockResources = ({ block, setFocusAction, id }) => {
             />
           </ResourceTooltip>
           {toggle}
+          {gpuEnabled && ( // just to put it after gpu toggle, i put it under {toglle}.
+            <div>
+              <label htmlFor={`gpu-size-dropdown-${id}`} className="block text-sm font-small">
+                GPU VRam
+              </label>
+              <select
+                id={`gpu-size-dropdown-${id}`}
+                value={gpuSize}
+                onChange={(e) => handleResourceChange("gpu-size", e.target.value)}
+                className="mt-1 block w-52 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+              >
+                <option value="24">24 GB</option>
+                {/* <option value="36">36 GB</option> */} {/* I can add more values like this....... */}
+                <option value="48">48 GB</option>
+              </select>
+            </div>
+          )}
         </div>
       )}
     </div>
