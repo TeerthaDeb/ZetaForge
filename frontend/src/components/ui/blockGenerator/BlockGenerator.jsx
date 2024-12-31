@@ -4,9 +4,8 @@ import { Code, View, CloudLogging } from "@carbon/icons-react";
 import { useImmerAtom } from "jotai-immer";
 import { useEffect, useRef, useState, useMemo } from "react";
 import { FileBlock } from "./FileBlock";
-import { FolderBlock } from "./Folder-uploadBlock";
+import { FolderBlock } from "./FolderBlock";
 import { MultiFileBlock } from "./MultiFileBlock";
-import { activeConfigurationAtom } from "@/atoms/anvilConfigurationsAtom";
 import { modalContentAtom } from "@/atoms/modalAtom";
 import { useAtom } from "jotai";
 import ClosableModal from "@/components/ui/modal/ClosableModal";
@@ -15,6 +14,7 @@ import React from "react";
 import { logsAtom } from "@/atoms/logsAtom";
 import { isEmpty, PipelineLogs } from "@/components/ui/PipelineLogs";
 import BlockEventsContent from "./BlockEventsContent";
+import { BlockResources } from "./BlockResources";
 
 const isTypeDisabled = (action) => {
   if (!action.parameters) {
@@ -34,10 +34,8 @@ const BlockGenerator = ({
   removeNodeRefs,
   nodeRefs,
 }) => {
-  const [pipeline, setFocusAction] = useImmerAtom(pipelineAtom);
-  const [editor, _s] = useAtom(drawflowEditorAtom);
-  const [configuration] = useAtom(activeConfigurationAtom);
-  const [logs, _] = useAtom(logsAtom);
+  const [, setFocusAction] = useImmerAtom(pipelineAtom);
+  const [logs] = useAtom(logsAtom);
 
   let styles = {
     top: `${block.views.node.pos_y}px`,
@@ -119,6 +117,14 @@ const BlockGenerator = ({
       draft.data[id].action.parameters[parameterName].value = value;
     });
   };
+  // Note: Right now everything uses kubernetes
+  // When executions can run on Katana we need to
+  // map the resource spec to Katana runner
+  // or disable this
+  let resources = (
+    <BlockResources block={block} setFocusAction={setFocusAction} id={id} />
+  );
+  const isContainer = !!block?.action?.container?.image && !preview;
 
   let content = (
     <BlockContent
@@ -133,7 +139,7 @@ const BlockGenerator = ({
   const type =
     block?.action?.parameters?.path?.type ||
     block?.action?.parameters?.files?.type;
-  if (type == "folder" || block.information.id == "folder-upload") {
+  if (block?.information?.id == "folder-upload") {
     content = (
       <FolderBlock
         blockId={id}
@@ -142,7 +148,7 @@ const BlockGenerator = ({
         history={history}
       />
     );
-  } else if (type == "file[]" || type == "multiFile") {
+  } else if (type == "file[]" || type == "blob[]") {
     content = (
       <MultiFileBlock
         blockId={id}
@@ -177,7 +183,6 @@ const BlockGenerator = ({
           {preview && (
             <BlockPreview id={id} src={iframeSrc} history={history} />
           )}
-
           <BlockTitle
             name={block.information.name}
             id={id}
@@ -210,6 +215,7 @@ const BlockGenerator = ({
             </div>
             {content}
           </div>
+          {isContainer ? resources : null}
         </div>
       </div>
     </div>
@@ -234,8 +240,6 @@ const BlockTitle = ({
   actions,
   src,
   blockEvents,
-  filteredLogs,
-  history,
 }) => {
   const [modalContent, setModalContent] = useAtom(modalContentAtom);
 
@@ -327,17 +331,8 @@ const parseHtmlToInputs = (html) => {
   return inputs;
 };
 
-const InputField = ({
-  type,
-  value,
-  name,
-  step,
-  parameterName,
-  onChange,
-  id,
-  nodeRefs,
-}) => {
-  const [editor, _] = useAtom(drawflowEditorAtom);
+const InputField = ({ value, name, parameterName, onChange, id }) => {
+  const [editor] = useAtom(drawflowEditorAtom);
   const [currentValue, setCurrentValue] = useState(value);
   const inputRef = useRef(null);
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
@@ -353,7 +348,7 @@ const InputField = ({
 
   useEffect(() => {
     if (inputRef?.current && isTextBlock) {
-      const { selectionStart, selectionEnd, value } = inputRef?.current;
+      const { selectionStart, selectionEnd, value } = inputRef.current;
       if (selectionStart === 3 && selectionEnd === 3 && value?.length === 3) {
         setCursorPosition(2);
       }
@@ -387,7 +382,7 @@ const InputField = ({
     const quotations = ['"', "'", "`"];
     const { key } = event;
 
-    const { selectionStart, selectionEnd } = inputRef?.current;
+    const { selectionStart, selectionEnd } = inputRef.current;
     const atBeginning = selectionStart === 0; // beginning of text, left of start quote
     const atEnd = selectionEnd - 2 === currentValue.length; // end of text, right of end quote
     const isRangedSelection = selectionStart !== selectionEnd; // substring is highlighted
@@ -428,7 +423,7 @@ const InputField = ({
       width="16"
       height="16"
       fill="gray"
-      class="bi bi-eye-fill"
+      className="bi bi-eye-fill"
       viewBox="0 0 16 16"
     >
       <path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0" />
@@ -442,7 +437,7 @@ const InputField = ({
       width="16"
       height="16"
       fill="gray"
-      class="bi bi-eye-slash-fill"
+      className="bi bi-eye-slash-fill"
       viewBox="0 0 16 16"
     >
       <path d="m10.79 12.912-1.614-1.615a3.5 3.5 0 0 1-4.474-4.474l-2.06-2.06C.938 6.278 0 8 0 8s3 5.5 8 5.5a7 7 0 0 0 2.79-.588M5.21 3.088A7 7 0 0 1 8 2.5c5 0 8 5.5 8 5.5s-.939 1.721-2.641 3.238l-2.062-2.062a3.5 3.5 0 0 0-4.474-4.474z" />
@@ -538,14 +533,7 @@ const InputField = ({
   }
 };
 
-const BlockContent = ({
-  html,
-  block,
-  onInputChange,
-  id,
-  history,
-  nodeRefs,
-}) => {
+const BlockContent = ({ html, block, onInputChange, id, nodeRefs }) => {
   const parsedInputs = parseHtmlToInputs(html);
 
   return (
@@ -574,7 +562,7 @@ const BlockContent = ({
 };
 
 const BlockInputs = React.memo(
-  ({ inputs, id, history, addNodeRefs, removeNodeRefs }) => {
+  ({ inputs, id, addNodeRefs, removeNodeRefs }) => {
     const nodeRef = useRef({});
     const [isReady, setIsReady] = useState(false);
 
@@ -614,7 +602,7 @@ const BlockInputs = React.memo(
 );
 
 const BlockOutputs = React.memo(
-  ({ outputs, id, history, addNodeRefs, removeNodeRefs }) => {
+  ({ outputs, id, addNodeRefs, removeNodeRefs }) => {
     const nodeRef = useRef({});
     const [isReady, setIsReady] = useState(false);
 
