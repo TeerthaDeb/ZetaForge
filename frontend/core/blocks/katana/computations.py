@@ -10,6 +10,7 @@ def compute(name_of_the_file: str, go_file: str, input_files = "", text_argument
         name_of_the_file (path): _description_
         go_file (path): _description_
         input_file (path): _description_
+        text_argument (str): _description_
 
     Returns:
         dict: files written
@@ -90,7 +91,8 @@ def compute(name_of_the_file: str, go_file: str, input_files = "", text_argument
         try:
             unknown_folder = next(os.scandir(history_dir)).path  # Get the first folder in history
             # List files inside the unknown folder
-            files_in_unknown_folder = os.listdir(unknown_folder)
+            files_in_unknown_folder = [os.path.join(f"katana/{name_of_the_pipeline}/history", os.path.basename(unknown_folder), file) 
+                            for file in os.listdir(unknown_folder)]
             # print(f"Files in the unknown folder: {files_in_unknown_folder}")
 
         except Exception as e:
