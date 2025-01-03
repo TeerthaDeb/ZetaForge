@@ -41,7 +41,8 @@ type ResourceQuantity struct {
 }
 
 type GPU struct {
-	Count int `json:"count"`
+	Count int    `json:"count"`
+	Size  string `json:"size,omitempty"` // VRAM size (e.g., "24", "48")
 }
 
 type Resources struct {

@@ -47,11 +47,12 @@ export const BlockResources = ({ block, setFocusAction, id }) => {
         draft.data[id].action.resources = {};
       }
       if (type === "gpu") {
-        draft.data[id].action.resources.gpu = { count: value ? (gpuSize === "48" ? 2 : 1) : 0 };
+        // Set GPU count to 1 when GPU is enabled, and 0 when disabled
+        draft.data[id].action.resources.gpu = { count: value ? 1 : 0 };
       } else if (type === "gpu-size") {
-        draft.data[id].action.resources.gpu = { count: gpuEnabled ? (value === "48" ? 2 : 1) : 0 };
-        // setGpuSize(value);
-        console.log("previous Gpu size: " , gpuSize);
+        // Adjust VRAM size but keep count as 1 GPU
+        draft.data[id].action.resources.gpu = { count: gpuEnabled ? 1 : 0, size: value };  // Set size to 24 or 48
+        console.log("previous Gpu size: ", gpuSize);
       } else {
         draft.data[id].action.resources[type] = {
           request: value,

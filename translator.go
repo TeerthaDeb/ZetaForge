@@ -291,11 +291,6 @@ func blockTemplate(block *zjson.Block, hash string, blockKey string, key string,
 								{
 									Key:      "karpenter.sh/nodepool",
 									Operator: corev1.NodeSelectorOpIn,
-									Values:   []string{"gpu-pool"},
-								},
-								{
-									Key:      "nvidia.com/gpu.memory",
-									Operator: corev1.NodeSelectorOpIn,
 									Values:   []string{gpuMemorySize},
 								},
 							},
