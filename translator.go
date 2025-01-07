@@ -5,9 +5,9 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"path/filepath"
-	"strconv"
 	"strings"
 
 	"server/zjson"
@@ -256,15 +256,28 @@ func blockTemplate(block *zjson.Block, hash string, blockKey string, key string,
 	// Based on how the resource limiter works
 	// Best practice here is just setting a request
 	setResourceIfValid(template.Container.Resources.Requests, corev1.ResourceCPU, block.Action.Resources.CPU.Request)
-
+	fmt.Println("cpu requst: ", block.Action.Resources.CPU.Request)
 	// Memory resources
 	setResourceIfValid(template.Container.Resources.Requests, corev1.ResourceMemory, block.Action.Resources.Memory.Request)
 	setResourceIfValid(template.Container.Resources.Limits, corev1.ResourceMemory, block.Action.Resources.Memory.Limit)
+	fmt.Println("memory requested: ", block.Action.Resources.Memory.Limit)
 
 	// GPU resources
 	if block.Action.Resources.GPU.Count > 0 {
-		gpuCount := strconv.Itoa(block.Action.Resources.GPU.Count)
-		if quantity, err := resource.ParseQuantity(gpuCount); err == nil {
+		var gpuMemorySize string
+
+		if block.Action.Resources.GPU.Count == 1 {
+			gpuMemorySize = "24Gi"
+		} else if block.Action.Resources.GPU.Count == 2 {
+			gpuMemorySize = "48Gi"
+		} else {
+			log.Printf("Error: Unsupported GPU count: %d", block.Action.Resources.GPU.Count)
+			return template
+		}
+
+		// Add GPU count to the template
+		gpuCountStr := "1" // 1Gpu for both 24 and 48 Gi
+		if quantity, err := resource.ParseQuantity(gpuCountStr); err == nil {
 			template.Container.Resources.Requests["nvidia.com/gpu"] = quantity
 			template.Container.Resources.Limits["nvidia.com/gpu"] = quantity
 		}
@@ -278,7 +291,7 @@ func blockTemplate(block *zjson.Block, hash string, blockKey string, key string,
 								{
 									Key:      "karpenter.sh/nodepool",
 									Operator: corev1.NodeSelectorOpIn,
-									Values:   []string{"gpu-pool"},
+									Values:   []string{gpuMemorySize},
 								},
 							},
 						},
